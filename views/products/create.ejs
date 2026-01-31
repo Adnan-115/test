@@ -52,4 +52,58 @@
                                             placeholder="500.00" value="<%= locals.formData ? formData.price : '' %>">
                                     </div>
                                 </div>
-<!-- TODO: lj3zvd -->
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="block text-xs font-bold text-text-secondary font-mono uppercase">Market
+                                    Sector (Category)</label>
+                                <div class="relative">
+                                    <select name="category"
+                                        class="w-full bg-bg border border-border rounded px-4 py-3 text-white focus:border-action focus:outline-none focus:ring-1 focus:ring-action transition font-mono appearance-none cursor-pointer">
+                                        <option value="Books">BOOKS & MANUALS</option>
+                                        <option value="Electronics">ELECTRONICS</option>
+                                        <option value="Furniture">DORM FURNITURE</option>
+                                        <option value="Clothing">APPAREL</option>
+                                        <option value="Stationery">STATIONERY</option>
+                                        <option value="Other">OTHER ASSETS</option>
+                                    </select>
+                                    <div class="absolute right-4 top-3 text-text-secondary pointer-events-none">
+                                        <i class="fas fa-chevron-down text-xs"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="block text-xs font-bold text-text-secondary font-mono uppercase">Full
+                                    Prospectus (Description)</label>
+                                <textarea name="description" rows="5" required
+                                    class="w-full bg-bg border border-border rounded px-4 py-3 text-white focus:border-action focus:outline-none focus:ring-1 focus:ring-action transition font-mono text-sm leading-relaxed"
+                                    placeholder="Provide detailed disclosure of asset condition, history, and specifications..."><%= locals.formData ? formData.description : '' %></textarea>
+                            </div>
+
+                            <!-- Image Upload with Preview Logic would go here - simplified for now -->
+                            <div class="space-y-2">
+                                <label class="block text-xs font-bold text-text-secondary font-mono uppercase">Asset
+                                    Images (Max 5)</label>
+                                <div
+                                    class="border-2 border-dashed border-border rounded-lg p-6 text-center hover:bg-bg/50 transition cursor-pointer relative">
+                                    <input type="file" name="images" multiple accept="image/*"
+                                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                                    <div class="text-text-secondary">
+                                        <i class="fas fa-cloud-upload-alt text-3xl mb-2 text-action"></i>
+                                        <p class="text-sm font-mono">DRAG FILES OR CLICK TO UPLOAD</p>
+                                        <p class="text-[10px] opacity-70 mt-1">SUPPORTED: JPG, PNG, WEBP</p>
+                                    </div>
+                                    <div id="preview-container"
+                                        class="mt-4 grid grid-cols-3 gap-2 hidden relative z-20 pointer-events-none">
+                                    </div>
+                                </div>
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', () => {
+                                        const fileInput = document.querySelector('input[name="images"]');
+                                        const previewContainer = document.getElementById('preview-container');
+                                        const dropZone = fileInput.closest('.border-dashed');
+
+                                        fileInput.addEventListener('change', function (e) {
+                                            previewContainer.innerHTML = '';
+<!-- WIP: Fixing bugs... -->
