@@ -30,4 +30,17 @@ const ProductSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-// WIP: Fixing bugs... 
+        enum: ['Available', 'Sold'],
+        default: 'Available'
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    isAnonymous: {
+        type: Boolean,
+        default: false
+    }
+});
+
+module.exports = mongoose.model('Product', ProductSchema);
