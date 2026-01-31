@@ -232,4 +232,119 @@
 
                         // Calc % change from base
                         const change = ((newPrice - this.basePrice) / this.basePrice) * 100;
-<!-- WIP: Fixing bugs... -->
+                        this.percentChange = (change > 0 ? '+' : '') + change.toFixed(2);
+
+                        // Update Order Book slightly
+                        this.updateOrderBook(newPrice);
+                    }, 2000);
+                },
+
+                generateOrderBook() {
+                    // Initial fake data
+                    for (let i = 0; i < 5; i++) {
+                        this.asks.push({ id: i, trader: 'Trader_' + Math.floor(Math.random() * 9000 + 1000), size: Math.floor(Math.random() * 5), price: (this.basePrice + (i + 1) * 5 + Math.random()).toFixed(2) });
+                        this.bids.push({ id: i, trader: 'Student_' + Math.floor(Math.random() * 9000 + 1000), size: Math.floor(Math.random() * 5), price: (this.basePrice - (i + 1) * 5 - Math.random()).toFixed(2) });
+                    }
+                },
+
+                updateOrderBook(centerPrice) {
+                    // Randomly update one bid/ask
+                    if (Math.random() > 0.5) {
+                        this.asks[0].price = (parseFloat(centerPrice) + Math.random() * 2).toFixed(2);
+                    } else {
+                        this.bids[0].price = (parseFloat(centerPrice) - Math.random() * 2).toFixed(2);
+                    }
+                },
+
+                initChart() {
+                    const ctx = document.getElementById('mainChart').getContext('2d');
+
+                    // Generate 30 days of fake data walking form base price
+                    const labels = Array.from({ length: 30 }, (_, i) => `Day ${i + 1}`);
+                    let dataPoints = [];
+                    let price = this.basePrice * 0.8; // Start lower
+                    for (let i = 0; i < 30; i++) {
+                        price = price * (1 + (Math.random() - 0.45) * 0.1); // Random walk
+                        dataPoints.push(price);
+                    }
+                    // Ensure ends near current
+                    dataPoints[29] = this.basePrice;
+
+                    // Gradient
+                    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                    gradient.addColorStop(0, 'rgba(41, 98, 255, 0.5)');
+                    gradient.addColorStop(1, 'rgba(41, 98, 255, 0)');
+
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Price History',
+                                data: dataPoints,
+                                borderColor: '#2962ff',
+                                backgroundColor: gradient,
+                                fill: true,
+                                tension: 0.4,
+                                pointRadius: 0,
+                                pointHoverRadius: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: { intersect: false, mode: 'index' },
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                x: { display: false },
+                                y: {
+                                    grid: { color: '#2a2e39' },
+                                    ticks: { color: '#b2b5be', font: { family: 'IBM Plex Mono' } }
+                                }
+                            }
+                        }
+                    });
+                },
+
+                addToPortfolio(type) {
+                    const item = {
+                        id: '<%= product._id %>',
+                        title: '<%= product.title %>',
+                        price: <%= product.price %>,
+                        image: '<%= product.images[0] || "" %>',
+                        type: type,
+                        timestamp: Date.now()
+                    };
+
+                    let portfolio = JSON.parse(localStorage.getItem('terminal_portfolio') || '[]');
+                    if (!portfolio.find(p => p.id === item.id)) {
+                        portfolio.push(item);
+                        localStorage.setItem('terminal_portfolio', JSON.stringify(portfolio));
+                        alert(type + ' ORDER CONFIRMED');
+                    } else {
+                        alert('POSITION ALREADY OPEN');
+                    }
+                    playTradeSound();
+                }
+            }
+        }
+
+        function playTradeSound() {
+            // Simple beep for trade execution
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.type = 'sine';
+            oscillator.frequency.value = 800;
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.1);
+
+            // redirect after sound
+            // window.location.href = ... (Buy Logic)
+        }
+    </script>
+
+    <%- include('../partials/footer') %>

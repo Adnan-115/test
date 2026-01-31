@@ -76,4 +76,82 @@ exports.startChat = async (req, res) => {
     }
 };
 
-// TODO: hl0bn2 
+/*
+ * Get all conversations
+ * Logic: Aggregates messages to show unique conversations with last message preview.
+ */
+exports.getConversations = async (req, res) => {
+    try {
+        // Aggregation to group by (otherUser, product)
+        const conversations = await Message.aggregate([
+            {
+                $match: {
+                    $or: [{ sender: req.user._id }, { receiver: req.user._id }],
+                    hiddenFor: { $ne: req.user._id } // Exclude hidden messages
+                }
+            },
+            {
+                $sort: { timestamp: -1 }
+            },
+            {
+                $group: {
+                    _id: {
+                        otherUser: {
+                            $cond: [
+                                { $eq: ["$sender", req.user._id] },
+                                "$receiver",
+                                "$sender"
+                            ]
+                        },
+                        product: "$product"
+                    },
+                    lastMessage: { $first: "$content" },
+                    lastSenderId: { $first: "$sender" },
+                    timestamp: { $first: "$timestamp" },
+                    unreadCount: {
+                        $sum: {
+                            $cond: [{ $and: [{ $eq: ["$receiver", req.user._id] }, { $eq: ["$read", false] }] }, 1, 0]
+                        }
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "_id.otherUser",
+                    foreignField: "_id",
+                    as: "userInfo"
+                }
+            },
+            {
+                $unwind: "$userInfo"
+            },
+            {
+                $lookup: {
+                    from: "products",
+                    localField: "_id.product",
+                    foreignField: "_id",
+                    as: "productInfo"
+                }
+            },
+            {
+                $unwind: { path: "$productInfo", preserveNullAndEmptyArrays: true }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    userId: "$userInfo._id",
+                    name: "$userInfo.name",
+                    studentId: "$userInfo.studentId",
+                    avatar: "$userInfo.avatar",
+                    productId: "$productInfo._id",
+                    productTitle: "$productInfo.title",
+                    productSellerId: "$productInfo.user",
+                    productImage: { $arrayElemAt: ["$productInfo.images", 0] },
+                    isAnonymous: "$productInfo.isAnonymous",
+                    lastMessage: 1,
+                    lastSenderId: 1,
+                    timestamp: 1,
+                    unreadCount: 1
+                }
+// WIP: Fixing bugs... 

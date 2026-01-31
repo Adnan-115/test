@@ -35,4 +35,41 @@
             letter-spacing: 5px;
             font-size: 1.2rem;
         }
-<!-- TODO: nhi6d -->
+
+        .btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .alert {
+            color: red;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-container">
+        <h2 style="text-align: center;">Verify Email</h2>
+        <p style="text-align: center;">We sent a code to <br><strong>
+                <%= typeof email !='undefined' ? email : 'your email' %>
+            </strong></p>
+
+        <div id="timer" style="text-align: center; color: #CC2936; font-weight: bold; margin-bottom: 20px;">
+            Time remaining: 05:00
+        </div>
+
+        <% if (locals.error && locals.error.length> 0) { %>
+            <div class="alert">
+                <%= error %>
+            </div>
+            <% } %>
+
+                <form action="/auth/verify" method="POST">
+<!-- WIP: Fixing bugs... -->

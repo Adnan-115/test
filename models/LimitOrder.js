@@ -20,4 +20,11 @@ const LimitOrderSchema = new mongoose.Schema({
         type: String,
         enum: ['ACTIVE', 'FILLED', 'CANCELLED'],
         default: 'ACTIVE'
-// WIP: Fixing bugs... 
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
+});
+
+module.exports = mongoose.model('LimitOrder', LimitOrderSchema);
