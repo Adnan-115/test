@@ -1,0 +1,41 @@
+<%- include('partials/header') %>
+
+    <!-- Market Dashboard Header -->
+    <div class="bg-surface border-b border-border py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <!-- Market Status -->
+                <div class="bg-bg border border-border p-4 rounded">
+                    <p class="text-text-secondary text-xs font-mono uppercase">Market Status</p>
+                    <div class="flex items-baseline space-x-2 mt-1">
+                        <span class="text-2xl font-mono text-bull font-bold">OPEN</span>
+                        <span class="text-xs text-text-secondary">09:30:00 EST</span>
+                    </div>
+                    <div class="mt-2 w-full bg-border h-1 rounded-full overflow-hidden">
+                        <div class="bg-bull h-full w-2/3 animate-pulse"></div>
+                    </div>
+                </div>
+
+                <!-- Volatility Index -->
+                <div class="bg-bg border border-border p-4 rounded">
+                    <p class="text-text-secondary text-xs font-mono uppercase">VIX (Volatility)</p>
+                    <div class="flex items-baseline space-x-2 mt-1">
+                        <span class="text-2xl font-mono text-white font-bold">18.42</span>
+                        <span class="text-xs text-bear font-mono">▼ -1.2%</span>
+                    </div>
+                    <!-- Mini line graph (simulated with CSS) -->
+                    <div class="flex items-end space-x-1 h-3 mt-2">
+                        <div class="w-1 bg-border h-2"></div>
+                        <div class="w-1 bg-border h-3"></div>
+                        <div class="w-1 bg-bear h-2"></div>
+                        <div class="w-1 bg-border h-4"></div>
+                    </div>
+                </div>
+
+                <!-- Total Volume -->
+                <div class="bg-bg border border-border p-4 rounded">
+                    <p class="text-text-secondary text-xs font-mono uppercase">24h Volume</p>
+                    <div class="flex items-baseline space-x-2 mt-1">
+                        <span class="text-2xl font-mono text-white font-bold">2.4M</span>
+                        <span class="text-xs text-bull font-mono">▲ +12%</span>
+<!-- TODO: 3ip0mf -->

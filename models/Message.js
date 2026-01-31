@@ -11,4 +11,17 @@ const MessageSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
-// TODO: tfj3vh 
+    },
+    product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
+        required: false
+    },
+    content: {
+        type: String,
+        required: true
+    },
+    read: {
+        type: Boolean,
+        default: false
+// WIP: Fixing bugs... 

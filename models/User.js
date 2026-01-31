@@ -23,4 +23,29 @@ const UserSchema = new mongoose.Schema({
     },
     contactNumber: {
         type: String
-// TODO: f6qj2z 
+    },
+    password: {
+        type: String,
+        select: false // Do not return password by default
+    },
+    googleId: String,
+    githubId: String,
+    isAdmin: {
+        type: Boolean,
+        default: false
+    },
+    avatar: {
+        type: String,
+        default: 'https://res.cloudinary.com/dzt8xvzhp/image/upload/v1738308000/default-avatar.png'
+    },
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
+    otp: String,
+    otpExpires: Date,
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+// WIP: Fixing bugs... 
