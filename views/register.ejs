@@ -192,4 +192,98 @@
                                     <input type="file" name="avatar" id="avatarInput" accept="image/*"
                                         style="display: none;" onchange="previewImage(this)">
                                 </div>
-<!-- WIP: Fixing bugs... -->
+                                <button type="button" class="avatar-remove" id="removeBtn" onclick="removeImage()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                                <div class="text-center text-[10px] text-text-secondary mt-1">UPLOAD ID PHOTO</div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] text-text-secondary mb-1">FULL NAME</label>
+                                <input type="text" name="name" required placeholder="John Doe"
+                                    class="w-full bg-bg border border-border rounded py-1.5 px-3 text-xs text-white focus:border-action outline-none font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-text-secondary mb-1">EMAIL ADDR</label>
+                                <input type="email" name="email" required placeholder="student@iut-dhaka.edu"
+                                    class="w-full bg-bg border border-border rounded py-1.5 px-3 text-xs text-white focus:border-action outline-none font-mono">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] text-text-secondary mb-1">STUDENT ID</label>
+                                <input type="text" name="studentId" required pattern="\d{9}" placeholder="190041234"
+                                    class="w-full bg-bg border border-border rounded py-1.5 px-3 text-xs text-white focus:border-action outline-none font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-text-secondary mb-1">CONTACT NO</label>
+                                <input type="tel" name="contactNumber" required placeholder="01712345678"
+                                    class="w-full bg-bg border border-border rounded py-1.5 px-3 text-xs text-white focus:border-action outline-none font-mono">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] text-text-secondary mb-1">PASSWORD</label>
+                            <input type="password" name="password" id="password" required placeholder="••••••••"
+                                minlength="8"
+                                class="w-full bg-bg border border-border rounded py-1.5 px-3 text-xs text-white focus:border-action outline-none font-mono">
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] text-text-secondary mb-1">CONFIRM PASSWORD</label>
+                            <input type="password" name="confirmPassword" id="confirmPassword" required
+                                placeholder="••••••••" minlength="8"
+                                class="w-full bg-bg border border-border rounded py-1.5 px-3 text-xs text-white focus:border-action outline-none font-mono">
+                        </div>
+
+                        <button type="submit"
+                            class="w-full bg-bull hover:bg-green-600 text-black font-bold py-2.5 rounded text-sm transition tracking-widest border border-green-700 shadow-[0_0_15px_rgba(0,227,150,0.3)] mt-2">
+                            CREATE IDENTITY
+                        </button>
+                    </form>
+
+                    <div class="mt-4 text-center text-xs text-text-secondary">
+                        ALREADY REGISTERED? <a href="/auth/login"
+                            class="text-action hover:text-white underline decoration-dashed underline-offset-4">LOGIN
+                            HERE</a>
+                    </div>
+        </div>
+    </div>
+
+    <script>
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const preview = document.getElementById('avatarPreview');
+                    const placeholder = document.getElementById('avatarPlaceholder');
+                    const removeBtn = document.getElementById('removeBtn');
+
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    placeholder.style.display = 'none';
+                    removeBtn.style.display = 'flex';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function removeImage() {
+            const input = document.getElementById('avatarInput');
+            const preview = document.getElementById('avatarPreview');
+            const placeholder = document.getElementById('avatarPlaceholder');
+            const removeBtn = document.getElementById('removeBtn');
+
+            input.value = '';
+            preview.src = '';
+            preview.style.display = 'none';
+            placeholder.style.display = 'flex';
+            removeBtn.style.display = 'none';
+        }
+    </script>
+</body>
+
+</html>

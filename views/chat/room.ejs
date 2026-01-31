@@ -62,4 +62,68 @@
                 </div>
             </div>
 
-<!-- TODO: tlz33x -->
+            <!-- Chat Messages Area -->
+            <div class="chat-messages flex-grow overflow-y-auto p-4 space-y-4 bg-bg relative" id="chat-messages">
+                <!-- Background Grid specific to chat -->
+                <div class="absolute inset-0 opacity-5 pointer-events-none"
+                    style="background-image: linear-gradient(#2d3748 1px, transparent 1px), linear-gradient(90deg, #2d3748 1px, transparent 1px); background-size: 20px 20px;">
+                </div>
+
+                <% messages.forEach(msg=> { %>
+                    <div
+                        class="relative z-10 flex w-full <%= msg.sender.toString() === user._id.toString() ? 'justify-end' : 'justify-start' %>">
+                        <div class="max-w-[70%]">
+                            <!-- Sender Label -->
+                            <div
+                                class="text-[8px] font-mono mb-1 <%= msg.sender.toString() === user._id.toString() ? 'text-right text-action' : 'text-left text-bear' %>">
+                                <%= msg.sender.toString()===user._id.toString() ? 'YOU' : 'REMOTE_NODE' %>
+                            </div>
+
+                            <!-- Message Bubble -->
+                            <div class="px-3 py-2 rounded text-xs font-mono leading-relaxed border <%= msg.sender.toString() === user._id.toString() 
+                                ? 'bg-action/10 text-white border-action/30 rounded-tr-none' 
+                                : 'bg-surface text-text-secondary border-border rounded-tl-none' %>">
+                                <%= msg.content %>
+                            </div>
+
+                            <!-- Timestamp -->
+                            <div
+                                class="text-[8px] text-text-secondary/50 mt-1 font-mono <%= msg.sender.toString() === user._id.toString() ? 'text-right' : 'text-left' %>">
+                                <%= msg.timestamp.toLocaleTimeString([], {hour: '2-digit' , minute:'2-digit'}) %>
+                            </div>
+                        </div>
+                    </div>
+                    <% }) %>
+            </div>
+
+            <!-- Chat Input Area -->
+            <div class="bg-surface border-t border-border p-3 z-10">
+                <form id="chat-form" class="flex items-center gap-3">
+                    <div class="flex-grow relative">
+                        <span
+                            class="absolute left-3 top-1/2 transform -translate-y-1/2 text-action font-mono text-xs">></span>
+                        <input type="text" id="msg"
+                            class="w-full bg-bg border border-border rounded py-2 pl-6 pr-3 text-sm text-white focus:border-action focus:ring-1 focus:ring-action outline-none font-mono placeholder-text-secondary/30 transition shadow-[inset_0_1px_3px_rgba(0,0,0,0.3)]"
+                            placeholder="TRANSMIT MESSAGE..." required autocomplete="off">
+                    </div>
+                    <button type="submit"
+                        class="bg-action hover:bg-blue-600 text-white p-2 rounded border border-action/50 transition shadow-[0_0_10px_rgba(41,98,255,0.2)]">
+                        <i class="fas fa-paper-plane text-xs"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Scanline Overlay -->
+            <div
+                class="absolute inset-0 pointer-events-none z-50 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,3px_100%]">
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const chatForm = document.getElementById('chat-form');
+        const chatMessages = document.querySelector('.chat-messages');
+        const sender = '<%= user._id %>';
+<!-- WIP: Fixing bugs... -->

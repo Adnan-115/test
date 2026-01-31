@@ -28,4 +28,16 @@ router.post('/', protect, (req, res, next) => {
                 user: req.user,
                 error: 'Image Upload Failed: ' + err.message,
                 formData: req.body
-// WIP: Fixing bugs... 
+            });
+        }
+        next();
+    });
+}, createProduct);
+router.post('/orders', protect, createLimitOrder);
+router.post('/orders/:id/delete', protect, deleteLimitOrder);
+router.get('/:id', getProduct);
+
+// Delete handled via POST
+router.post('/:id/delete', protect, deleteProduct);
+
+module.exports = router;
