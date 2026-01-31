@@ -48,4 +48,26 @@ const UserSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-// WIP: Fixing bugs... 
+    lastLogout: {
+        type: Date,
+        default: null
+    }
+});
+
+// Encrypt password using bcrypt
+// Source: https://www.npmjs.com/package/bcryptjs
+UserSchema.pre('save', async function () {
+    // If password is not modified OR if it doesn't exist (e.g. OAuth), skip hashing
+    if (!this.isModified('password') || !this.password) {
+        return;
+    }
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+});
+
+// Match user entered password to hashed password in database
+UserSchema.methods.matchPassword = async function (enteredPassword) {
+    return await bcrypt.compare(enteredPassword, this.password);
+};
+
+module.exports = mongoose.model('User', UserSchema);

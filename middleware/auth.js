@@ -18,4 +18,24 @@ exports.protect = async (req, res, next) => {
     }
 
     try {
-// TODO: f1xikd 
+        // 3. Verify token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // 4. Find user in database
+        req.user = await User.findById(decoded.id);
+
+        if (!req.user) {
+            res.clearCookie('token');
+            return res.redirect('/auth/login');
+        }
+
+        // 5. Ensure user is verified (Required since you implemented OTP)
+        if (!req.user.isVerified) {
+            // If they have an email, we can help them verify
+            return res.redirect(`/auth/verify?email=${req.user.email}`);
+        }
+
+        // 6. Check if token was issued before the last logout
+        if (req.user.lastLogout) {
+            const lastLogoutTime = new Date(req.user.lastLogout).getTime() / 1000;
+// WIP: Fixing bugs... 

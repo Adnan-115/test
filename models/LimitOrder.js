@@ -9,4 +9,15 @@ const LimitOrderSchema = new mongoose.Schema({
     },
     sector: {
         type: String,
-// TODO: xoseu 
+        required: true,
+        enum: ['Electronics', 'Clothing', 'Books', 'Furniture', 'Other'] // Align with Product categories
+    },
+    maxPrice: { // The "Strike Price"
+        type: Number,
+        required: true
+    },
+    status: {
+        type: String,
+        enum: ['ACTIVE', 'FILLED', 'CANCELLED'],
+        default: 'ACTIVE'
+// WIP: Fixing bugs... 
