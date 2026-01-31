@@ -38,4 +38,21 @@ exports.protect = async (req, res, next) => {
         // 6. Check if token was issued before the last logout
         if (req.user.lastLogout) {
             const lastLogoutTime = new Date(req.user.lastLogout).getTime() / 1000;
-// WIP: Fixing bugs... 
+            if (decoded.iat < lastLogoutTime) {
+                res.clearCookie('token');
+                return res.redirect('/auth/login');
+            }
+        }
+
+        // 7. Security: Prevent caching of protected pages
+        res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+        res.set('Pragma', 'no-cache');
+        res.set('Expires', '0');
+
+        next();
+    } catch (err) {
+        console.error("Auth Middleware Error:", err.message);
+        res.clearCookie('token');
+        return res.redirect('/');
+    }
+};
