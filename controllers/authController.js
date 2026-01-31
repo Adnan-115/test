@@ -1,0 +1,129 @@
+// Auth Controller
+// Main Tutorial: https://www.youtube.com/watch?v=SnoAwLP1a-0 (Express Auth)
+// OTP/Email Tutorial: https://youtube.com/playlist?list=PLk8gdrb2DmCiR_TF0Dc0c11E6yDvVOM68&si=KooscOCE8hFseUsw
+// Source: https://www.geeksforgeeks.org/building-an-otp-verification-system-with-node-js-and-mongodb/ 
+const User = require('../models/User');
+
+// JWT Logic
+// Source: https://jwt.io/introduction
+const jwt = require('jsonwebtoken');
+
+// Generate JWT Token
+const generateToken = (id) => {
+    return jwt.sign({ id }, process.env.JWT_SECRET, {
+        expiresIn: '30d'
+    });
+};
+
+/*
+ * Register User
+ * Logic: Validates @iut-dhaka.edu email (Self-Imposed Rule)
+ */
+exports.register = async (req, res) => {
+    try {
+        const { name, email, password, studentId, contactNumber } = req.body;
+
+        let avatar = 'https://ui-avatars.com/api/?name=' + name + '&background=0b0e11&color=fff&size=128'; // Default
+        if (req.file) {
+            avatar = req.file.path; // Cloudinary URL
+        }
+
+        // Check if email domain is valid
+        if (!email.endsWith('@iut-dhaka.edu')) {
+            return res.status(400).render('register', { error: 'Registration restricted to @iut-dhaka.edu emails only' });
+        }
+
+        // Validate Student ID (9 digits)
+        if (!/^\d{9}$/.test(studentId)) {
+            return res.status(400).render('register', { error: 'Student ID must be exactly 9 digits' });
+        }
+
+        // Validate Contact Number (BD format)
+        if (!/^(?:\+88|88)?(01[3-9]\d{8})$/.test(contactNumber)) {
+            return res.status(400).render('register', { error: 'Invalid Bangladesh contact number' });
+        }
+
+        // Check if user exists (email or student ID)
+        const userExists = await User.findOne({
+            $or: [{ email }, { studentId }]
+        });
+
+        if (userExists) {
+            let msg = 'User already exists';
+            if (userExists.email === email) msg = 'Email already registered';
+            if (userExists.studentId === studentId) msg = 'Student ID already registered';
+            return res.status(400).render('register', { error: msg });
+        }
+
+        // Create user
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpExpires = Date.now() + 5 * 60 * 1000; // 5 mins
+
+        const user = await User.create({
+            name,
+            email,
+            password,
+            studentId,
+            contactNumber,
+            avatar,
+            otp,
+            otpExpires,
+            isVerified: false
+        });
+
+        // Send OTP Email
+        const sendEmail = require('../utils/sendEmail');
+        const emailTemplate = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 10px; overflow: hidden;">
+                <div style="background-color: #CC2936; padding: 20px; text-align: center; color: white;">
+                    <h1 style="margin: 0;">IUT Marketplace</h1>
+                </div>
+                <div style="padding: 20px; background-color: #f9f9f9;">
+                    <h2 style="color: #333; text-align: center;">Verify Your Email</h2>
+                    <p style="color: #666; text-align: center; font-size: 16px;">Thank you for joining IUT Marketplace. Please use the verification code below to complete your registration.</p>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <span style="background-color: #fff; padding: 15px 30px; font-size: 24px; font-weight: bold; border: 2px solid #CC2936; border-radius: 5px; color: #CC2936; letter-spacing: 5px;">${otp}</span>
+                    </div>
+                    <p style="color: #666; text-align: center;">This code will expire in <strong>5 minutes</strong>.</p>
+                    <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px 0;">
+                    <p style="color: #999; font-size: 12px; text-align: center;">If you didn't request this, please ignore this email.</p>
+                </div>
+            </div>
+        `;
+
+        try {
+            await sendEmail({
+                email: user.email,
+                subject: 'Verify your ID - IUT Marketplace',
+                message: emailTemplate
+            });
+
+            res.redirect(`/auth/verify?email=${email}`);
+        } catch (err) {
+            console.error(err);
+            return res.redirect(`/auth/verify?email=${email}&error=CheckConsoleForOTP`);
+        }
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).render('register', { error: err.message });
+    }
+};
+
+/*
+ * Verify OTP
+ * Logic: Matches entered OTP with database record and enforces expiration time.
+ */
+exports.verifyOtp = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.render('verify', { error: 'User not found', email });
+        }
+
+        if (user.isVerified) {
+            return res.redirect('/auth/login');
+        }
+// TODO: vik6k 
