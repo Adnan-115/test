@@ -94,4 +94,50 @@ module.exports = function (passport) {
             if (profile.emails && profile.emails.length > 0) {
                 email = profile.emails.find(e => e.primary || e.verified).value;
             }
-// WIP: Fixing bugs... 
+
+            if (!email) {
+                return done(null, false, { message: 'No public email found on GitHub account.' });
+            }
+
+            if (!email.endsWith('@iut-dhaka.edu')) {
+                return done(null, false, { message: 'Access Denied: Please use your @iut-dhaka.edu email.' });
+            }
+
+            // Extract Student ID if present (9 digits)
+            const idMatch = email.match(/\d{9}/);
+            const studentId = idMatch ? idMatch[0] : undefined;
+
+            const newUser = {
+                githubId: profile.id,
+                name: profile.displayName || profile.username,
+                email: email,
+                avatar: profile.photos[0].value,
+                studentId: studentId
+            };
+
+            try {
+                let user = await User.findOne({ email: email });
+
+                if (user) {
+                    let updated = false;
+                    if (!user.githubId) {
+                        user.githubId = profile.id;
+                        updated = true;
+                    }
+                    if (!user.studentId && studentId) {
+                        user.studentId = studentId;
+                        updated = true;
+                    }
+                    if (updated) await user.save();
+
+                    done(null, user);
+                } else {
+                    user = await User.create(newUser);
+                    done(null, user);
+                }
+            } catch (err) {
+                console.error(err);
+                done(err, null);
+            }
+        }));
+};

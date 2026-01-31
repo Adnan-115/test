@@ -26,4 +26,14 @@ exports.checkUser = async (req, res, next) => {
                 req.user = user;
                 res.locals.user = user;
             } else {
-// WIP: Fixing bugs... 
+                res.locals.user = null;
+            }
+        } catch (err) {
+
+            res.locals.user = null;
+        }
+    } else {
+        res.locals.user = null;
+    }
+    next();
+};
