@@ -6,4 +6,12 @@ module.exports = async (req, res, next) => {
     if (req.user) {
         try {
             const unreadCount = await Message.countDocuments({
-// TODO: 2d87ws 
+                receiver: req.user._id,
+                read: false
+            });
+            res.locals.unreadCount = unreadCount;
+        } catch (err) {
+            console.error(err);
+            res.locals.unreadCount = 0;
+        }
+// WIP: Fixing bugs... 
