@@ -1,0 +1,109 @@
+<%- include('../partials/header') %>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8 border-b border-border pb-4">
+            <div class="flex-1 mr-4">
+                <div class="mb-1">
+                    <h2 class="text-3xl font-bold text-white tracking-tight flex items-center space-x-3 font-mono">
+                        <i class="fas fa-network-wired text-action text-2xl animate-pulse"></i>
+                        <span>IUT MARKETPLACE</span>
+                    </h2>
+                    <div class="flex items-center gap-2 mt-1 pl-1">
+                        <span class="text-[10px] font-mono text-bull animate-pulse">● SYSTEM ONLINE</span>
+                        <span class="text-[10px] font-mono text-text-secondary/50">|</span>
+                        <p class="text-[10px] text-text-secondary font-mono tracking-widest">
+                            ENCRYPTED P2P EXCHANGE // VERIFIED STUDENT NODES
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- DYNAMIC MARKET STATUS DASHBOARD -->
+            <div class="hidden md:flex gap-4 mb-8 w-full" x-data="{ 
+                volatility: 45,
+                volume: 1204,
+                active: 84,
+                init() {
+                    setInterval(() => {
+                        this.volatility = Math.min(Math.max(this.volatility + (Math.random() - 0.5) * 10, 10), 90);
+                        this.volume += Math.floor((Math.random() - 0.3) * 5);
+                        this.active += Math.floor((Math.random() - 0.5) * 3);
+                    }, 2000);
+                }
+            }">
+                <!-- Volatility Meter -->
+                <div class="bg-bg border border-border p-3 rounded flex-1">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-[10px] text-text-secondary font-mono">MARKET VOLATILITY</span>
+                        <span class="text-xs font-bold text-bear font-mono"
+                            x-text="Math.floor(volatility) + '%'">45%</span>
+                    </div>
+                    <div class="w-full h-1.5 bg-surface rounded-full overflow-hidden">
+                        <div class="h-full bg-bear transition-all duration-1000 ease-in-out"
+                            :style="`width: ${volatility}%`"></div>
+                    </div>
+                </div>
+
+                <!-- 24h Volume -->
+                <div class="bg-bg border border-border p-3 rounded flex-1">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-[10px] text-text-secondary font-mono">24H VOLUME</span>
+                        <span class="text-[10px] text-bull font-mono">▲ 4.2%</span>
+                    </div>
+                    <div class="text-xl font-bold text-white font-mono" x-text="'৳' + volume.toLocaleString()">৳1,204
+                    </div>
+                </div>
+
+                <!-- Active Traders -->
+                <div class="bg-bg border border-border p-3 rounded flex-1">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-[10px] text-text-secondary font-mono">ACTIVE NODES</span>
+                        <span class="text-[10px] text-action font-mono animate-pulse">● LIVE</span>
+                    </div>
+                    <div class="text-xl font-bold text-white font-mono" x-text="active">84</div>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 bg-surface p-1 rounded border border-border">
+                <button
+                    class="px-3 py-1 rounded text-[10px] font-bold bg-bg text-white border border-border shadow-sm flex items-center gap-2">
+                    <i class="fas fa-th-large text-action"></i> GRID
+                </button>
+                <button
+                    class="px-3 py-1 rounded text-[10px] font-bold text-text-secondary hover:text-white flex items-center gap-2 hover:bg-bg/50 transition">
+                    <i class="fas fa-list"></i> LIST
+                </button>
+            </div>
+        </div>
+
+        <div class="mb-8 overflow-hidden w-full relative border-y border-border/50 bg-black/20 py-1">
+            <div class="ticker-wrap flex-1 overflow-hidden relative h-6">
+                <div class="ticker-move whitespace-nowrap absolute top-0 left-0 flex items-center h-full">
+                    <% products.forEach(p=> { %>
+                        <span class="inline-block px-4 text-xs font-mono text-text-secondary">
+                            <i class="fas fa-cube text-[8px] opacity-30 mr-1"></i>
+                            <%= p.title.toUpperCase() %>: <span class="text-bull font-bold">৳<%= p.price %></span>
+                                <span class="text-text-secondary/30 ml-2">|</span>
+                        </span>
+                        <% }); %>
+                            <% products.forEach(p=> { %>
+                                <span class="inline-block px-4 text-xs font-mono text-text-secondary">
+                                    <i class="fas fa-cube text-[8px] opacity-30 mr-1"></i>
+                                    <%= p.title.toUpperCase() %>: <span class="text-bull font-bold">৳<%= p.price %>
+                                        </span>
+                                        <span class="text-text-secondary/30 ml-2">|</span>
+                                </span>
+                                <% }); %>
+                </div>
+            </div>
+            <style>
+                .ticker-wrap {
+                    mask-image: linear-gradient(to right, transparent, black 2%, black 98%, transparent);
+                    -webkit-mask-image: linear-gradient(to right, transparent, black 2%, black 98%, transparent);
+                }
+
+                .ticker-move {
+<!-- TODO: e8zu -->
