@@ -130,4 +130,68 @@ exports.createProduct = async (req, res) => {
 exports.deleteProduct = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
-// WIP: Fixing bugs... 
+
+        if (!product) {
+            return res.status(404).json({ success: false, error: 'Product not found' });
+        }
+
+        // Make sure user is product owner
+        if (product.user.toString() !== req.user.id) {
+            return res.status(401).json({ success: false, error: 'Not authorized' });
+        }
+
+        await product.deleteOne();
+
+        res.redirect('/dashboard');
+    } catch (err) {
+        console.error(err);
+        res.redirect('/dashboard');
+    }
+};
+
+/*
+ * Create Limit Order
+ * Logic: Places a "buy" order at a specific price point.
+ */
+exports.createLimitOrder = async (req, res) => {
+    try {
+        const { sector, maxPrice } = req.body;
+
+        await LimitOrder.create({
+            user: req.user.id,
+            sector,
+            maxPrice
+        });
+
+        res.redirect('/products');
+    } catch (err) {
+        console.error(err);
+        res.redirect('/products');
+    }
+};
+
+/*
+ * Delete Limit Order
+ */
+exports.deleteLimitOrder = async (req, res) => {
+    try {
+        const order = await LimitOrder.findById(req.params.id);
+
+        if (!order) {
+            return res.status(404).json({ success: false, error: 'Order not found' });
+        }
+
+        // Verify ownership
+        if (order.user.toString() !== req.user.id) {
+            return res.status(401).json({ success: false, error: 'Not authorized' });
+        }
+
+        await order.deleteOne();
+        console.log(`[ORDER] Limit Order ${req.params.id} cancelled by user`);
+
+        res.redirect('/dashboard');
+    } catch (err) {
+        console.error(err);
+        res.redirect('/dashboard');
+    }
+};

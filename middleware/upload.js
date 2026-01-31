@@ -9,4 +9,15 @@ require('dotenv').config();
 // Source: https://cloudinary.com/documentation/node_integration
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-// TODO: aa4c 
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+
+
+// Configure Storage
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'iut-mart', // Folder in Cloudinary
+// WIP: Fixing bugs... 
