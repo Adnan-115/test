@@ -106,4 +106,56 @@
 
                                         fileInput.addEventListener('change', function (e) {
                                             previewContainer.innerHTML = '';
-<!-- WIP: Fixing bugs... -->
+                                            previewContainer.classList.remove('hidden');
+
+                                            if (this.files.length > 0) {
+                                                // Visual feedback on dropzone
+                                                dropZone.classList.add('border-action', 'bg-action/5');
+
+                                                Array.from(this.files).forEach(file => {
+                                                    const reader = new FileReader();
+                                                    reader.onload = function (e) {
+                                                        const div = document.createElement('div');
+                                                        div.className = 'relative aspect-square bg-black border border-border rounded overflow-hidden group';
+                                                        div.innerHTML = `
+                                                            <img src="${e.target.result}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition">
+                                                            <div class="absolute bottom-0 left-0 right-0 bg-black/80 text-[8px] text-white p-1 truncate font-mono">
+                                                                ${file.name}
+                                                            </div>
+                                                        `;
+                                                        previewContainer.appendChild(div);
+                                                    }
+                                                    reader.readAsDataURL(file);
+                                                });
+                                            } else {
+                                                dropZone.classList.remove('border-action', 'bg-action/5');
+                                                previewContainer.classList.add('hidden');
+                                            }
+                                        });
+                                    });
+                                </script>
+                            </div>
+
+                            <div class="flex items-center space-x-3 p-4 bg-bg/50 border border-border rounded">
+                                <input type="checkbox" name="isAnonymous" id="isAnonymous"
+                                    class="w-4 h-4 rounded border-border bg-bg text-action focus:ring-0">
+                                <div>
+                                    <label for="isAnonymous"
+                                        class="text-sm font-bold text-white font-mono cursor-pointer block">DARK POOL
+                                        LISTING (ANONYMOUS)</label>
+                                    <p class="text-[10px] text-text-secondary">Hide your identity on the public ledger.
+                                        Buyers can still contact you securely.</p>
+                                </div>
+                            </div>
+
+                            <button type="submit"
+                                class="w-full bg-action hover:bg-blue-600 text-white font-mono font-bold py-4 rounded shadow-lg shadow-action/20 transition transform active:scale-[0.99] flex items-center justify-center space-x-2">
+                                <i class="fas fa-paper-plane"></i>
+                                <span>SUBMIT FOR PUBLIC TRADING</span>
+                            </button>
+                        </form>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../partials/footer') %>

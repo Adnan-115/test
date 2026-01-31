@@ -254,4 +254,128 @@ exports.logout = async (req, res) => {
 
     // 3. Destroy Passport/Express Session (Important for Google/GitHub Auth)
     req.logout((err) => {
-// WIP: Fixing bugs... 
+        if (err) { console.error("Passport Logout Error:", err); }
+
+        req.session.destroy((err) => {
+            if (err) { console.error("Session Destroy Error:", err); }
+
+            // 4. Clear Session Cookie
+            res.clearCookie('connect.sid', { path: '/' });
+
+            // 5. Redirect home
+            res.redirect('/');
+        });
+    });
+};
+
+/*
+ * Show Complete Profile Form
+ */
+exports.completeProfileForm = (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.redirect('/auth/login');
+    }
+    res.render('complete-profile', { user: req.user });
+};
+
+/*
+ * Process Complete Profile
+ * Logic: Collects missing Student ID/Contact for Social Login users.
+ */
+exports.completeProfile = async (req, res) => {
+    try {
+        if (!req.isAuthenticated()) {
+            return res.redirect('/auth/login');
+        }
+
+        const { studentId, contactNumber } = req.body;
+        const user = await User.findById(req.user.id);
+
+        if (!user) {
+            return res.redirect('/auth/logout');
+        }
+
+        // Validate Student ID
+        if (!/^\d{9}$/.test(studentId)) {
+            return res.render('complete-profile', { error: 'Student ID must be exactly 9 digits', user });
+        }
+
+        // Validate Contact
+        if (!/^(?:\+88|88)?(01[3-9]\d{8})$/.test(contactNumber)) {
+            return res.render('complete-profile', { error: 'Invalid Bangladesh number', user });
+        }
+
+        // Check uniqueness
+        const existing = await User.findOne({
+            $or: [{ studentId }, { contactNumber }],
+            _id: { $ne: user._id } // Exclude current user
+        });
+
+        if (existing) {
+            return res.render('complete-profile', { error: 'Student ID or Contact Number already in use', user });
+        }
+
+        user.studentId = studentId;
+        user.contactNumber = contactNumber;
+        user.isVerified = true;
+
+        if (req.file) {
+            user.avatar = req.file.path;
+        }
+
+        await user.save();
+
+        // Regenerate JWT token
+        const token = generateToken(user._id);
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 30 * 24 * 60 * 60 * 1000
+        });
+
+        res.redirect('/dashboard');
+
+    } catch (err) {
+        res.render('complete-profile', { error: 'Server Error', user: req.user });
+    }
+};
+
+/*
+ * Update User Avatar
+ */
+exports.updateAvatar = async (req, res) => {
+    try {
+        if (!req.file) {
+            req.flash('error', 'Please upload a file.');
+            return res.redirect('back');
+        }
+
+        const user = await User.findById(req.user.id);
+        user.avatar = req.file.path;
+        await user.save();
+
+        req.flash('success', 'Profile picture updated!');
+        res.redirect(req.header('Referer') || '/');
+    } catch (err) {
+        console.error(err);
+        req.flash('error', 'Server Error');
+        res.redirect(req.header('Referer') || '/');
+    }
+};
+
+/*
+ * Remove User Avatar
+ */
+exports.removeAvatar = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        user.avatar = undefined; // Reset to default
+        await user.save();
+        req.flash('success', 'Profile picture removed.');
+        res.redirect(req.header('Referer') || '/');
+    } catch (err) {
+        console.error(err);
+        req.flash('error', 'Server Error');
+        res.redirect(req.header('Referer') || '/');
+    }
+};
