@@ -18,4 +18,11 @@ const sendEmail = async (options) => {
         from: `IUT Marketplace <${process.env.EMAIL_USER}>`,
         to: options.email,
         subject: options.subject,
-// WIP: Fixing bugs... 
+        html: options.message
+    };
+
+    // Send email
+    await transporter.sendMail(mailOptions);
+};
+
+module.exports = sendEmail;
