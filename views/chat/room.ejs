@@ -1,0 +1,65 @@
+<%- include('../partials/header') %>
+
+    <div class="container mx-auto px-4 py-8 max-w-5xl h-[85vh] flex flex-col">
+        <!-- Terminal Window Frame -->
+        <div
+            class="bg-surface border border-border rounded-lg shadow-2xl overflow-hidden flex flex-col flex-grow relative">
+
+            <!-- Room Header -->
+            <div class="bg-black/50 border-b border-border p-3 flex justify-between items-center z-10">
+                <div class="flex items-center gap-3">
+                    <a href="/chat" class="text-text-secondary hover:text-white transition">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+
+                    <% if (!otherUser) { %>
+                        <h3 class="text-sm font-bold text-white font-mono uppercase tracking-wider">
+                            <%= title %>
+                        </h3>
+                        <% } else { %>
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded bg-black border border-border overflow-hidden relative">
+                                    <% if (isAnonymousContext) { %>
+                                        <div
+                                            class="w-full h-full flex items-center justify-center bg-bg text-text-secondary">
+                                            <i class="fas fa-user-secret"></i>
+                                        </div>
+                                        <% } else { %>
+                                            <img src="<%= otherUser.avatar || 'https://ui-avatars.com/api/?name=' + otherUser.name + '&background=0b0e11&color=fff' %>"
+                                                class="w-full h-full object-cover">
+                                            <div
+                                                class="hidden absolute inset-0 w-full h-full flex items-center justify-center bg-bg text-text-secondary">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                            <% } %>
+
+                                                <!-- Online Status Dot -->
+                                                <div
+                                                    class="absolute bottom-0 right-0 w-2 h-2 bg-bull rounded-full border border-black transform translate-x-1/3 translate-y-1/3">
+                                                </div>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-white font-mono leading-none">
+                                        <%= title.toUpperCase() %>
+                                    </h3>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <span
+                                            class="text-[8px] text-bull font-mono border border-bull/20 px-1 rounded bg-bull/5">SECURE_LINK_ESTABLISHED</span>
+                                        <span class="text-[8px] text-text-secondary font-mono">ID: <%=
+                                                otherUser._id.toString().substring(0,6) %></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <% } %>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <div class="flex flex-col items-end">
+                        <span class="text-[8px] text-text-secondary font-mono">ENCRYPTION: AES-256</span>
+                        <span class="text-[8px] text-text-secondary font-mono">SIGNAL: <span
+                                class="text-bull">STRONG</span></span>
+                    </div>
+                </div>
+            </div>
+
+<!-- TODO: tlz33x -->

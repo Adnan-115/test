@@ -1,0 +1,118 @@
+
+<%- include('../partials/header') %>
+
+    <div class="container mx-auto px-4 py-8" x-data="terminalData()">
+        <!-- Top Bar: Asset Name & Quick Stats -->
+        <div
+            class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-border pb-4">
+            <div>
+                <div class="flex items-center space-x-3 mb-1">
+                    <h1 class="text-3xl font-bold text-white font-mono tracking-tighter">
+                        <%= product.title.toUpperCase() %>
+                    </h1>
+                    <span
+                        class="px-2 py-0.5 rounded bg-action/20 text-action text-xs font-mono border border-action/30">SPOT</span>
+                </div>
+                <div class="flex items-center space-x-4 text-xs font-mono text-text-secondary">
+                    <span>SECTOR: <span class="text-white">
+                            <%= product.category.toUpperCase() %>
+                        </span></span>
+                    <span>ID: <span class="text-white">
+                            <%= product._id.toString().substring(0,8) %>
+                        </span></span>
+                </div>
+            </div>
+
+            <div class="flex items-end flex-col mt-4 md:mt-0">
+                <div class="flex items-baseline space-x-3">
+                    <span class="text-xl font-bold text-bull font-mono" x-text="'৳' + currentPrice">৳<%= product.price
+                            %></span>
+                    <span class="text-sm text-bull flex items-center">
+                        <i class="fas fa-caret-up mr-1"></i>
+                        <span x-text="percentChange + '%'">+2.45%</span>
+                    </span>
+                </div>
+                <p class="text-[10px] text-gray-400 font-mono mt-1">BASE PRICE: <span class="text-white font-bold">৳<%=
+                            product.price %></span> • REAL-TIME FEED</p>
+            </div>
+        </div>
+
+        <!-- Main Terminal Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-auto lg:h-[600px]">
+
+            <!-- Left Col: Visuals (3 cols) -->
+            <div class="lg:col-span-3 flex flex-col gap-4 h-full" x-data="{ 
+                activeImage: '<%= (product.images && product.images.length > 0) ? product.images[0] : "" %>',
+                images: <%= JSON.stringify(product.images || []) %> 
+            }">
+                <div
+                    class="bg-surface border border-border rounded-lg p-2 h-64 lg:h-auto flex-grow relative overflow-hidden group">
+                    <!-- Scanline Effect -->
+                    <div
+                        class="absolute inset-0 bg-gradient-to-b from-transparent via-action/5 to-transparent z-10 animate-scan pointer-events-none">
+                    </div>
+
+                    <% if (product.images && product.images.length> 0) { %>
+                        <img :src="activeImage"
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            onerror="this.style.display='none'; this.parentElement.querySelector('.fallback-icon').classList.remove('hidden');">
+
+                        <div
+                            class="hidden w-full h-full flex flex-col items-center justify-center bg-black/50 border border-border/50 fallback-icon absolute inset-0">
+                            <i class="fas fa-cube text-4xl text-border mb-2 opacity-50"></i>
+                            <span class="text-xs font-mono text-bear tracking-widest">[REDACTED]</span>
+                        </div>
+                        <% } else { %>
+                            <div
+                                class="w-full h-full flex flex-col items-center justify-center bg-black/50 border border-border/50">
+                                <i class="fas fa-cube text-4xl text-border mb-2 opacity-50"></i>
+                                <span class="text-xs font-mono text-bear tracking-widest">[REDACTED]</span>
+                            </div>
+                            <% } %>
+
+                                <div
+                                    class="absolute bottom-2 right-2 px-2 py-1 bg-black/80 text-[10px] font-mono text-white border border-white/20">
+                                    IMG_SOURCE: TRADER_UPLOAD
+                                </div>
+                </div>
+
+                <!-- Thumbnails -->
+                <% if (product.images && product.images.length> 1) { %>
+                    <div class="grid grid-cols-5 gap-2">
+                        <template x-for="img in images">
+                            <div @click="activeImage = img"
+                                class="aspect-square bg-bg border rounded cursor-pointer overflow-hidden relative"
+                                :class="activeImage === img ? 'border-action opacity-100' : 'border-border opacity-50 hover:opacity-100'">
+                                <img :src="img" class="w-full h-full object-cover">
+                            </div>
+                        </template>
+                    </div>
+                    <% } %>
+
+                        <!-- Asset Fundamentals -->
+                        <div class="bg-surface border border-border rounded-lg p-4 flex-grow overflow-y-auto">
+                            <h3 class="text-xs font-bold text-text-secondary border-b border-border pb-2 mb-2">ASSET
+                                FUNDAMENTALS</h3>
+                            <p class="text-sm text-white font-mono leading-relaxed opacity-80">
+                                <%= product.description %>
+                            </p>
+
+                            <div class="mt-4 pt-4 border-t border-border">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs text-text-secondary">SELLER RATING</span>
+                                    <div class="flex space-x-1">
+                                        <i class="fas fa-star text-bull text-xs"></i>
+                                        <i class="fas fa-star text-bull text-xs"></i>
+                                        <i class="fas fa-star text-bull text-xs"></i>
+                                        <i class="fas fa-star text-bull text-xs"></i>
+                                        <i class="fas fa-star text-gray-600 text-xs"></i>
+                                    </div>
+                                </div>
+                                <% if (user && product.user && user._id.toString() !==product.user._id.toString()) { %>
+                                    <a href="/chat/start/<%= product.user._id %>?productId=<%= product._id %>"
+                                        class="block w-full text-center py-2 mt-4 border border-text-secondary text-text-secondary hover:text-white hover:border-white text-xs font-mono transition">
+                                        INITIATE SECURE COMMS
+                                    </a>
+                                    <% } %>
+                            </div>
+<!-- TODO: i9c1fr -->
