@@ -46,4 +46,52 @@ module.exports = function (passport) {
             const newUser = {
                 googleId: profile.id,
                 name: profile.displayName,
-// TODO: x3alql 
+                email: email,
+                avatar: profile.photos[0].value,
+                studentId: studentId
+            };
+
+            try {
+                let user = await User.findOne({ email: email });
+
+                if (user) {
+                    // Update Google ID and Student ID if missing
+                    let updated = false;
+                    if (!user.googleId) {
+                        user.googleId = profile.id;
+                        updated = true;
+                    }
+                    if (!user.studentId && studentId) {
+                        user.studentId = studentId;
+                        updated = true;
+                    }
+                    if (updated) await user.save();
+
+                    done(null, user);
+                } else {
+                    user = await User.create(newUser);
+                    done(null, user);
+                }
+            } catch (err) {
+                console.error(err);
+                done(err, null);
+            }
+        }));
+
+    /**
+     * GitHub Strategy
+     * Source: https://www.passportjs.org/packages/passport-github2/
+     */
+    passport.use(new GitHubStrategy({
+        clientID: process.env.GITHUB_CLIENT_ID,
+        clientSecret: process.env.GITHUB_CLIENT_SECRET,
+        callbackURL: '/auth/github/callback',
+        scope: ['user:email']
+    },
+        async (accessToken, refreshToken, profile, done) => {
+            // Github emails can be private/multiple, need to handle carefully
+            let email = null;
+            if (profile.emails && profile.emails.length > 0) {
+                email = profile.emails.find(e => e.primary || e.verified).value;
+            }
+// WIP: Fixing bugs... 

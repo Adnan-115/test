@@ -118,4 +118,124 @@
                                         </div>
                                         <div class="ml-4 flex-grow">
                                             <div class="flex justify-between items-start">
-<!-- TODO: kejeqb -->
+                                                <h3 class="text-white font-bold truncate w-32 md:w-48">
+                                                    <%= product.title %>
+                                                </h3>
+                                                <span class="text-bull font-mono font-bold">৳<%= product.price %></span>
+                                            </div>
+                                            <p class="text-xs text-text-secondary font-mono mt-1 mb-3">SECTOR: <%=
+                                                    product.category.toUpperCase() %>
+                                            </p>
+
+                                            <div class="flex items-center space-x-2 mt-auto">
+                                                <a href="/products/<%= product._id %>"
+                                                    class="px-3 py-1 bg-border hover:bg-white/10 text-xs text-white rounded transition">VIEW</a>
+                                                <form action="/products/<%= product._id %>/delete" method="POST"
+                                                    class="inline"
+                                                    onsubmit="return confirm('LIQUIDATE asset? This cannot be undone.')">
+                                                    <button
+                                                        class="px-3 py-1 bg-bear/10 hover:bg-bear text-bear hover:text-white border border-bear/20 hover:border-bear text-xs rounded transition uppercase">Liquidate</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Mini Sparkline Decoration -->
+                                    <div class="h-1 w-full flex">
+                                        <div class="bg-bull h-full w-[<%= Math.floor(Math.random() * 60 + 20) %>%]">
+                                        </div>
+                                        <div class="bg-bg h-full flex-grow"></div>
+                                    </div>
+                                </div>
+                                <% }) %>
+                        </div>
+                        <% } else { %>
+                            <div class="bg-surface border border-border border-dashed rounded-lg p-8 text-center">
+                                <p class="text-text-secondary font-mono text-sm">NO ACTIVE SELL ORDERS (IPO) LISTED</p>
+                            </div>
+                            <% } %>
+                </div>
+
+                <!-- Open Orders (Limit Orders) -->
+                <div class="mb-8">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-bold text-white flex items-center space-x-2">
+                            <span class="w-1 h-5 bg-action block"></span>
+                            <span>OPEN ORDERS (bids)</span>
+                        </h2>
+                        <span class="text-xs text-text-secondary font-mono">
+                            <%= typeof myOrders !=='undefined' ? myOrders.length : 0 %> ORDERS PENDING
+                        </span>
+                    </div>
+
+                    <div class="bg-surface border border-border rounded-lg overflow-hidden">
+                        <% if (typeof myOrders !=='undefined' && myOrders.length> 0) { %>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm font-mono">
+                                    <thead class="bg-bg text-text-secondary border-b border-border">
+                                        <tr>
+                                            <th class="px-4 py-3 font-bold text-xs uppercase">Date</th>
+                                            <th class="px-4 py-3 font-bold text-xs uppercase">Sector</th>
+                                            <th class="px-4 py-3 font-bold text-xs uppercase">Max Strike Price</th>
+                                            <th class="px-4 py-3 font-bold text-xs uppercase">Status</th>
+                                            <th class="px-4 py-3 font-bold text-xs uppercase text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-border">
+                                        <% myOrders.forEach(order=> { %>
+                                            <tr class="hover:bg-white/5 transition cursor-pointer"
+                                                onclick="window.location.href='/products?sector=<%= order.sector %>&maxPrice=<%= order.maxPrice %>'">
+                                                <td class="px-4 py-3 text-white">
+                                                    <%= new Date(order.createdAt).toLocaleDateString() %>
+                                                        <span class="text-text-secondary text-[10px] ml-1">
+                                                            <%= new Date(order.createdAt).toLocaleTimeString([],
+                                                                {hour: '2-digit' , minute:'2-digit'}) %>
+                                                        </span>
+                                                </td>
+                                                <td class="px-4 py-3 text-action font-bold uppercase">
+                                                    <%= order.sector %>
+                                                </td>
+                                                <td class="px-4 py-3 text-white">৳<%= order.maxPrice %>
+                                                </td>
+                                                <td class="px-4 py-3">
+                                                    <% if (order.matches && order.matches.length> 0) { %>
+                                                        <span
+                                                            class="px-2 py-0.5 rounded text-[10px] font-bold bg-bull/10 text-bull border border-bull/20">FILLED</span>
+                                                        <% } else if (order.status==='ACTIVE' ) { %>
+                                                            <span
+                                                                class="px-2 py-0.5 rounded text-[10px] font-bold bg-action/10 text-action border border-action/20">ACTIVE</span>
+                                                            <% } else if (order.status==='FILLED' ) { %>
+                                                                <span
+                                                                    class="px-2 py-0.5 rounded text-[10px] font-bold bg-bull/10 text-bull border border-bull/20">FILLED</span>
+                                                                <% } else { %>
+                                                                    <span
+                                                                        class="px-2 py-0.5 rounded text-[10px] font-bold bg-text-secondary/10 text-text-secondary border border-border">CANCELLED</span>
+                                                                    class="px-2 py-0.5 rounded text-[10px] font-bold
+                                                                    bg-text-secondary/10 text-text-secondary border
+                                                                    border-border">CANCELLED</span>
+                                                                    <% } %>
+                                                </td>
+                                                <td class="px-4 py-3 text-right">
+                                                    <form action="/products/orders/<%= order._id %>/delete"
+                                                        method="POST" class="inline-block"
+                                                        onsubmit="event.stopPropagation(); return confirm('Cancel this limit order?');">
+                                                        <button type="submit" onclick="event.stopPropagation()"
+                                                            class="text-text-secondary hover:text-bear transition p-1 rounded hover:bg-bear/10">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                            <!-- Matches Logic -->
+                                            <% if (order.matches && order.matches.length> 0) { %>
+                                                <tr class="bg-surface/50 border-b border-border">
+                                                    <td colspan="4" class="p-4">
+                                                        <p
+                                                            class="text-[10px] font-mono text-bull font-bold mb-2 flex items-center gap-2">
+                                                            <i class="fas fa-check-circle"></i>
+                                                            MATCHING ASSETS FOUND (<%= order.matches.length %>)
+                                                        </p>
+                                                        <div
+                                                            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                                            <% order.matches.forEach(match=> { %>
+                                                                <div
+<!-- WIP: Fixing bugs... -->
