@@ -1,0 +1,83 @@
+<!-- Reference: https://youtu.be/yy9cbu_e3Xg?si=v4zGJB5RmCDNTMbN (This tutorial was followed for all EJS files) -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FINALIZE IDENTITY | IUT MART</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bg: '#0b0e11',
+                        surface: '#151a21',
+                        action: '#2962ff',
+                        border: '#2d3748',
+                        text: {
+                            primary: '#e2e8f0',
+                            secondary: '#a0aec0'
+                        },
+                        bull: '#00e396',
+                        bear: '#ff007a'
+                    },
+                    fontFamily: {
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #0b0e11;
+            color: #e2e8f0;
+        }
+
+        .scanline {
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.2));
+            background-size: 100% 4px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        /* Avatar Upload Styling */
+        .avatar-upload {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 10px;
+            border-radius: 4px;
+            overflow: hidden;
+            background: #151a21;
+            border: 1px dashed #2d3748;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .avatar-upload:hover {
+            border-color: #2962ff;
+            box-shadow: 0 0 10px rgba(41, 98, 255, 0.2);
+        }
+
+        .avatar-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .avatar-placeholder {
+<!-- TODO: u9b2sq -->
