@@ -126,4 +126,65 @@
         const chatForm = document.getElementById('chat-form');
         const chatMessages = document.querySelector('.chat-messages');
         const sender = '<%= user._id %>';
-<!-- WIP: Fixing bugs... -->
+        const receiver = '<%= otherUser._id %>';
+
+        // Join my room
+        socket.emit('join', sender);
+
+        // Message from server
+        socket.on('message', (message) => {
+            // Only display if it's relevant to this conversation
+            if (message.sender === receiver || message.sender === sender) {
+                outputMessage(message);
+            }
+        });
+
+        // Message submit
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const msgInput = document.getElementById('msg');
+            const content = msgInput.value;
+
+            // Emit message to server
+            socket.emit('chatMessage', { sender, receiver, content, productId: '<%= productId %>' });
+
+            // Clear input
+            msgInput.value = '';
+            msgInput.focus();
+        });
+
+        function outputMessage(message) {
+            const isMe = message.sender === sender;
+            const div = document.createElement('div');
+            // Tailwind classes for message container
+            div.className = `relative z-10 flex w-full ${isMe ? 'justify-end' : 'justify-start'}`;
+
+            const time = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            div.innerHTML = `
+                <div class="max-w-[70%]">
+                    <div class="text-[8px] font-mono mb-1 ${isMe ? 'text-right text-action' : 'text-left text-bear'}">
+                        ${isMe ? 'YOU' : 'REMOTE_NODE'}
+                    </div>
+                    <div class="px-3 py-2 rounded text-xs font-mono leading-relaxed border ${isMe
+                    ? 'bg-action/10 text-white border-action/30 rounded-tr-none'
+                    : 'bg-surface text-text-secondary border-border rounded-tl-none'}">
+                        ${message.content}
+                    </div>
+                    <div class="text-[8px] text-text-secondary/50 mt-1 font-mono ${isMe ? 'text-right' : 'text-left'}">
+                        ${time}
+                    </div>
+                </div>
+            `;
+
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Scroll to bottom on load
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    </script>
+
+
+    <%- include('../partials/footer') %>
