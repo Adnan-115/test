@@ -126,4 +126,132 @@ exports.verifyOtp = async (req, res) => {
         if (user.isVerified) {
             return res.redirect('/auth/login');
         }
-// TODO: vik6k 
+
+        if (user.otp !== otp) {
+            return res.render('verify', { error: 'Invalid Code', email });
+        }
+
+        if (user.otpExpires < Date.now()) {
+            return res.render('verify', { error: 'Code expired. Please request a new one.', email });
+        }
+
+        // Verify user
+        user.isVerified = true;
+        user.otp = undefined;
+        user.otpExpires = undefined;
+        await user.save();
+
+        // Log them in
+        const token = generateToken(user._id);
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 30 * 24 * 60 * 60 * 1000
+        });
+
+        // Use req.login to ensure passport session is active too (essential for social/complete-profile flow)
+        req.login(user, function (err) {
+            if (err) { return next(err); }
+            if (!user.studentId || !user.contactNumber) {
+                return res.redirect('/auth/complete-profile');
+            }
+            return res.redirect('/dashboard');
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.render('verify', { error: 'Server Error' });
+    }
+};
+
+/*
+ * Show Verify Form
+ */
+exports.verifyForm = (req, res) => {
+    res.render('verify', { email: req.query.email });
+};
+
+/*
+ * Login User
+ * Logic: Authenticates using Email/Password and issues JWT.
+ */
+exports.login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // Validate email & password
+        if (!email || !password) {
+            return res.status(400).render('login', { error: 'Please provide an email and password' });
+        }
+
+        // Check for user
+        const user = await User.findOne({ email }).select('+password');
+
+        if (!user) {
+            return res.status(401).render('login', { error: 'Invalid credentials' });
+        }
+
+        // Check if user has a password (social login users might not)
+        if (!user.password) {
+            return res.status(400).render('login', { error: 'Please login using your social account (Google/GitHub)' });
+        }
+
+        // Check password
+        const isMatch = await user.matchPassword(password);
+
+        if (!isMatch) {
+            return res.status(401).render('login', { error: 'Invalid credentials' });
+        }
+
+        if (!user.isVerified) {
+            if (user.password) {
+                return res.redirect(`/auth/verify?email=${user.email}`);
+            }
+        }
+
+        // Send token in cookie
+        const token = generateToken(user._id);
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+        });
+
+        res.redirect('/dashboard');
+    } catch (err) {
+        console.error(err);
+        res.status(500).render('login', { error: 'Server Error' });
+    }
+};
+
+/*
+ * Logout User
+ * Logic: Invalidates session and clears cookies.
+ */
+exports.logout = async (req, res) => {
+    try {
+        // 1. Invalidate JWT Server-side
+        if (req.cookies.token) {
+            const decoded = jwt.decode(req.cookies.token);
+            if (decoded) {
+                const user = await User.findById(decoded.id);
+                if (user) {
+                    user.lastLogout = Date.now();
+                    await user.save();
+                }
+            }
+        }
+    } catch (err) {
+        console.error("Logout Error:", err);
+    }
+
+    // 2. Clear JWT Cookie
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        path: '/'
+    });
+
+    // 3. Destroy Passport/Express Session (Important for Google/GitHub Auth)
+    req.logout((err) => {
+// WIP: Fixing bugs... 

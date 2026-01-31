@@ -58,4 +58,64 @@ router.get('/google/callback', (req, res, next) => {
                 // Send Email
                 const sendEmail = require('../utils/sendEmail');
                 const emailTemplate = `
-// TODO: z5ldg 
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 10px; overflow: hidden;">
+                        <div style="background-color: #CC2936; padding: 20px; text-align: center; color: white;">
+                            <h1 style="margin: 0;">IUT Marketplace</h1>
+                        </div>
+                        <div style="padding: 20px; background-color: #f9f9f9;">
+                            <h2 style="color: #333; text-align: center;">Verify Your Email</h2>
+                            <p style="color: #666; text-align: center; font-size: 16px;">We noticed a login attempt via Google. Please use the verification code below to complete your login.</p>
+                            <div style="text-align: center; margin: 30px 0;">
+                                <span style="background-color: #fff; padding: 15px 30px; font-size: 24px; font-weight: bold; border: 2px solid #CC2936; border-radius: 5px; color: #CC2936; letter-spacing: 5px;">${user.otp}</span>
+                            </div>
+                            <p style="color: #666; text-align: center;">This code will expire in <strong>5 minutes</strong>.</p>
+                        </div>
+                    </div>
+                `;
+                try {
+                    await sendEmail({
+                        email: user.email,
+                        subject: 'Verify your ID - IUT Marketplace',
+                        message: emailTemplate
+                    });
+                } catch (e) {
+                    // Email failed
+                }
+            }
+            return res.redirect(`/auth/verify?email=${user.email}`);
+        }
+
+        req.logIn(user, (err) => {
+            if (err) { return next(err); }
+
+            // Check if profile is complete
+            if (!user.studentId || !user.contactNumber) {
+                return res.redirect('/auth/complete-profile');
+            }
+
+            const jwt = require('jsonwebtoken');
+            const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+            res.cookie('token', token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 30 * 24 * 60 * 60 * 1000
+            });
+            res.redirect('/dashboard');
+        });
+    })(req, res, next);
+});
+
+// GitHub Auth
+router.get('/github', passport.authenticate('github', { scope: ['user:email'] }));
+
+router.get('/github/callback', (req, res, next) => {
+    passport.authenticate('github', async (err, user, info) => {
+        if (err) { return next(err); }
+        if (!user) {
+            if (info && info.message && info.message.includes('@iut-dhaka.edu')) {
+                req.flash('error', info.message);
+                return res.redirect('/auth/register');
+            }
+            req.flash('error', 'Authentication failed (Email might be private or invalid).');
+            return res.redirect('/auth/login');
+// WIP: Fixing bugs... 
