@@ -118,4 +118,61 @@ router.get('/github/callback', (req, res, next) => {
             }
             req.flash('error', 'Authentication failed (Email might be private or invalid).');
             return res.redirect('/auth/login');
-// WIP: Fixing bugs... 
+        }
+        // OTP Required
+        if (!user.isVerified) {
+            if (!user.otp || user.otpExpires < Date.now()) {
+                user.otp = Math.floor(100000 + Math.random() * 900000).toString();
+                user.otpExpires = Date.now() + 5 * 60 * 1000; // 5 mins
+                await user.save();
+
+                const sendEmail = require('../utils/sendEmail');
+                const emailTemplate = `
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 10px; overflow: hidden;">
+                        <div style="background-color: #CC2936; padding: 20px; text-align: center; color: white;">
+                            <h1 style="margin: 0;">IUT Marketplace</h1>
+                        </div>
+                        <div style="padding: 20px; background-color: #f9f9f9;">
+                            <h2 style="color: #333; text-align: center;">Verify Your Email</h2>
+                            <p style="color: #666; text-align: center; font-size: 16px;">We noticed a login attempt via GitHub. Please use the verification code below to complete your login.</p>
+                            <div style="text-align: center; margin: 30px 0;">
+                                <span style="background-color: #fff; padding: 15px 30px; font-size: 24px; font-weight: bold; border: 2px solid #CC2936; border-radius: 5px; color: #CC2936; letter-spacing: 5px;">${user.otp}</span>
+                            </div>
+                            <p style="color: #666; text-align: center;">This code will expire in <strong>5 minutes</strong>.</p>
+                        </div>
+                    </div>
+                `;
+                try {
+                    await sendEmail({
+                        email: user.email,
+                        subject: 'Verify your ID - IUT Marketplace',
+                        message: emailTemplate
+                    });
+                } catch (e) {
+                    // Email failed
+                }
+            }
+            return res.redirect(`/auth/verify?email=${user.email}`);
+        }
+
+        req.logIn(user, (err) => {
+            if (err) { return next(err); }
+
+            // Check if profile is complete
+            if (!user.studentId || !user.contactNumber) {
+                return res.redirect('/auth/complete-profile');
+            }
+
+            const jwt = require('jsonwebtoken');
+            const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+            res.cookie('token', token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 30 * 24 * 60 * 60 * 1000
+            });
+            res.redirect('/dashboard');
+        });
+    })(req, res, next);
+});
+
+module.exports = router;

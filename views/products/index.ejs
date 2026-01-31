@@ -214,4 +214,110 @@
                         <!-- Asset Image -->
                         <div class="w-full h-48 bg-bg relative overflow-hidden border-b border-border">
                             <% if (product.images && product.images.length> 0) { %>
-<!-- WIP: Fixing bugs... -->
+                                <div class="w-full h-full relative">
+                                    <img src="<%= product.images[0] %>" alt="<%= product.title %>"
+                                        class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition duration-500 group-hover:scale-105"
+                                        onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
+                                    <div
+                                        class="hidden absolute inset-0 w-full h-full flex flex-col items-center justify-center bg-black/50 border border-border/50">
+                                        <i class="fas fa-cube text-xl text-border mb-1 opacity-50"></i>
+                                        <span class="text-[8px] font-mono text-bear tracking-widest">[REDACTED]</span>
+                                    </div>
+                                </div>
+                                <% } else { %>
+                                    <div
+                                        class="w-full h-full flex flex-col items-center justify-center bg-black/50 border border-border/50">
+                                        <i class="fas fa-cube text-xl text-border mb-1 opacity-50"></i>
+                                        <span class="text-[8px] font-mono text-bear tracking-widest">[REDACTED]</span>
+                                    </div>
+                                    <% } %>
+
+                                        <!-- Sector Tag -->
+                                        <div
+                                            class="absolute top-2 left-2 bg-black/80 backdrop-blur-sm border border-border px-2 py-1 rounded text-[10px] font-mono text-text-secondary">
+                                            SECTOR: <%= product.category.toUpperCase() %>
+                                        </div>
+                        </div>
+
+                        <div class="p-4 flex-grow flex flex-col justify-between" x-data="{ id: '<%= product._id %>' }">
+                            <div>
+                                <div class="flex justify-between items-start mb-2">
+                                    <h3 class="text-white font-bold text-base truncate pr-2 w-3/4">
+                                        <%= product.title %>
+                                    </h3>
+                                    <span class="w-16">
+                                        <canvas id="spark-<%= product._id %>" height="30"></canvas>
+                                    </span>
+                                </div>
+
+                                <!-- Price Display -->
+                                <div class="flex items-baseline space-x-2 mb-4">
+                                    <span class="text-text-secondary text-xs font-mono">LAST:</span>
+                                    <span class="text-xl font-mono text-bull font-bold">৳<%= product.price %></span>
+                                </div>
+
+                                <div
+                                    class="flex items-center space-x-2 text-[10px] text-text-secondary font-mono mb-4 border-t border-border pt-2">
+                                    <span>
+                                        <% if (product.isAnonymous) { %>
+                                            <span class="text-bear">SOURCE: REDACTED</span>
+                                            <% } else if (product.user && product.user.name) { let
+                                                traderName=product.user.name.replace(/\d+/g, '' ).trim().toUpperCase();
+                                                let traderId='####' ; if (product.user.studentId) {
+                                                traderId=product.user.studentId.toString(); } %>
+                                                <i class="fas fa-user-circle text-text-secondary mr-1"></i>
+                                                <%= traderName %>
+                                                    <span class="text-text-secondary/50 mx-1">ID:</span>
+                                                    <%= traderId %> <span class="text-text-secondary/50 mx-1">•</span>
+                                                        VOL: HIGH
+                                                        <% } else { %>
+                                                            UNKNOWN
+                                                            <% } %>
+                                    </span>
+                                    <span>•</span>
+                                    <span>VOL: HIGH</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <% }) %>
+            </div>
+
+            <!-- Sparklines Script -->
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    const products = <% - JSON.stringify(products) %>;
+                    products.forEach(p => {
+                        const ctx = document.getElementById(`spark-${p._id}`)?.getContext('2d');
+                        if (ctx) {
+                            // Generate random data for sparkline
+                            const data = Array.from({ length: 10 }, () => Math.floor(Math.random() * 100));
+
+                            new Chart(ctx, {
+                                type: 'line',
+                                data: {
+                                    labels: Array(10).fill(''),
+                                    datasets: [{
+                                        data: data,
+                                        borderColor: '#00e396',
+                                        borderWidth: 1.5,
+                                        pointRadius: 0,
+                                        fill: false,
+                                        tension: 0.4
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                                    scales: { x: { display: false }, y: { display: false } }
+                                }
+                            });
+                        }
+                    });
+                });
+            </script>
+            <% } %>
+                </div>
+
+                <%- include('../partials/footer') %>

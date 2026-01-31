@@ -154,4 +154,78 @@ exports.getConversations = async (req, res) => {
                     timestamp: 1,
                     unreadCount: 1
                 }
-// WIP: Fixing bugs... 
+            },
+            {
+                $sort: { timestamp: -1 }
+            }
+        ]);
+
+        // Post-process for display logic
+        const formattedConversations = conversations.map(convo => {
+            const isMyProduct = convo.productSellerId && convo.productSellerId.toString() === req.user.id;
+
+            let displayName = convo.name;
+            let displayAvatar = convo.avatar;
+            let displayId = convo.studentId;
+
+            // Logic for Anonymous Sellers
+            let showAsAnonymous = false;
+
+            if (!isMyProduct && convo.isAnonymous) {
+                // I am Buyer, Product is Anonymous -> Seller is Anonymous
+                showAsAnonymous = true;
+
+                displayName = "Anonymous Seller";
+                displayAvatar = "default-avatar.png";
+                displayId = null;
+            }
+
+            return {
+                ...convo,
+                name: displayName,
+                avatar: displayAvatar,
+                studentId: displayId,
+                isAnonymous: showAsAnonymous // Override DB flag with view logic
+            };
+        });
+
+        // Render the inbox
+        res.render('chat/inbox', {
+            conversations: formattedConversations
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.redirect('/dashboard');
+    }
+};
+
+/*
+ * Delete conversation (Hide for user)
+ */
+exports.deleteConversation = async (req, res) => {
+    try {
+        const otherUserId = req.params.userId;
+        const productId = req.query.productId;
+
+        let query = {
+            $or: [
+                { sender: req.user.id, receiver: otherUserId },
+                { sender: otherUserId, receiver: req.user.id }
+            ]
+        };
+
+        if (productId) {
+            query.product = productId;
+        }
+
+        await Message.updateMany(query, {
+            $addToSet: { hiddenFor: req.user.id }
+        });
+
+        res.redirect('/chat');
+    } catch (err) {
+        console.error(err);
+        res.redirect('/chat');
+    }
+};

@@ -112,4 +112,58 @@ app.get('/dashboard', protect, preventCache, async (req, res) => {
         return orderObj;
     }));
 
-// WIP: Fixing bugs... 
+    res.render('dashboard', {
+        title: 'Dashboard',
+        user: req.user,
+        myProducts,
+        myOrders: ordersWithMatches
+    });
+});
+
+/**
+ * Socket.io Real-time Chat Logic
+ * Source: Adapted from Socket.io documentation with custom DB integration.
+ */
+const Message = require('./models/Message');
+
+io.on('connection', (socket) => {
+    console.log('New client connected');
+
+    socket.on('join', (userId) => {
+        socket.join(userId);
+        console.log(`User ${userId} joined their room`);
+    });
+
+    socket.on('chatMessage', async (msg) => {
+        const { sender, receiver, content, productId } = msg;
+
+        try {
+            // Save message to MongoDB
+            const newMessage = await Message.create({
+                sender,
+                receiver,
+                content,
+                product: (productId && productId.length > 0) ? productId : null
+            });
+
+            // Real-time dispatch
+            io.to(receiver).emit('message', newMessage);
+
+            if (sender.toString() !== receiver.toString()) {
+                io.to(sender).emit('message', newMessage);
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    });
+
+    socket.on('disconnect', () => {
+        console.log('Client disconnected');
+    });
+});
+
+const PORT = process.env.PORT || 5000;
+
+server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
