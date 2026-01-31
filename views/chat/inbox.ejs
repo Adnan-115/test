@@ -44,4 +44,50 @@
                                                             <% } %>
                                                 </div>
                                                 <% if (convo.unreadCount> 0) { %>
-<!-- TODO: l39oqc -->
+                                                    <div
+                                                        class="absolute -top-1 -right-1 w-4 h-4 bg-action rounded-full flex items-center justify-center text-[10px] text-white font-bold border border-bg">
+                                                        <%= convo.unreadCount %>
+                                                    </div>
+                                                    <% } %>
+                                            </div>
+
+                                            <div>
+                                                <div class="flex items-center gap-2 mb-1">
+                                                    <span
+                                                        class="text-sm font-bold text-white font-mono group-hover:text-action transition">
+                                                        <%= convo.name %>
+                                                    </span>
+                                                    <% if (convo.studentId) { %>
+                                                        <span
+                                                            class="text-[10px] text-text-secondary border border-border px-1 rounded font-mono">
+                                                            <%= convo.studentId %>
+                                                        </span>
+                                                        <% } %>
+                                                            <span
+                                                                class="text-[10px] text-text-secondary font-mono ml-2">
+                                                                <%= convo.timestamp ? new
+                                                                    Date(convo.timestamp).toLocaleDateString([],
+                                                                    {month:'short', day:'numeric'}) : '' %>
+                                                            </span>
+                                                </div>
+
+                                                <div class="flex items-center gap-2 text-xs text-text-secondary">
+                                                    <% if (convo.productImage) { %>
+                                                        <img src="<%= convo.productImage %>"
+                                                            class="w-4 h-4 rounded object-cover border border-border">
+                                                        <% } else { %>
+                                                            <i class="fas fa-box text-[10px]"></i>
+                                                            <% } %>
+                                                                <span
+                                                                    class="font-mono text-[10px] uppercase tracking-wide text-text-secondary/70">REF:
+                                                                    <%= convo.productTitle || 'GENERAL' %>
+                                                                </span>
+                                                </div>
+
+                                                <p
+                                                    class="text-sm text-text-secondary mt-1 line-clamp-1 font-mono group-hover:text-white transition group-hover:translate-x-1 duration-200">
+                                                    <% if (convo.lastSenderId &&
+                                                        convo.lastSenderId.toString()===user._id.toString()) { %>
+                                                        <span class="text-action select-none">>> </span>
+                                                        <% } %>
+<!-- WIP: Fixing bugs... -->

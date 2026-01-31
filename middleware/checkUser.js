@@ -12,4 +12,18 @@ exports.checkUser = async (req, res, next) => {
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             const user = await User.findById(decoded.id);
-// TODO: cxu69 
+
+            if (user) {
+                // Check if token was issued before the last logout
+                if (user.lastLogout) {
+                    const lastLogoutTime = new Date(user.lastLogout).getTime() / 1000;
+                    if (decoded.iat < lastLogoutTime) {
+                        res.locals.user = null;
+                        return next();
+                    }
+                }
+
+                req.user = user;
+                res.locals.user = user;
+            } else {
+// WIP: Fixing bugs... 

@@ -14,4 +14,20 @@ const ProductSchema = new mongoose.Schema({
     description: {
         type: String,
         required: [true, 'Please add a description']
-// TODO: 8vq7c9 
+    },
+    price: {
+        type: Number,
+        required: [true, 'Please add a price']
+    },
+    category: {
+        type: String,
+        required: [true, 'Please select a category'],
+        enum: ['Books', 'Electronics', 'Furniture', 'Clothing', 'Stationery', 'Other']
+    },
+    images: {
+        type: [String],
+        default: []
+    },
+    status: {
+        type: String,
+// WIP: Fixing bugs... 
