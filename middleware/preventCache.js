@@ -6,4 +6,4 @@ module.exports = (req, res, next) => {
     res.set('Expires', '0');
     res.set('Surrogate-Control', 'no-store');
     next();
-// WIP: Fixing bugs... 
+};

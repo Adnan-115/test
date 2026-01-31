@@ -72,4 +72,38 @@
             <% } %>
 
                 <form action="/auth/verify" method="POST">
-<!-- WIP: Fixing bugs... -->
+                    <input type="hidden" name="email" value="<%= typeof email != 'undefined' ? email : '' %>">
+                    <div class="form-group">
+                        <label style="text-align: center;">Enter 6-digit Code</label>
+                        <input type="text" name="otp" required maxlength="6" placeholder="123456">
+                    </div>
+                    <button type="submit" class="btn">Verify</button>
+                </form>
+
+                <script>
+                    // Simple 5 minute timer
+                    let timeLeft = 300; // 5 minutes in seconds
+                    const timerElement = document.getElementById('timer');
+
+                    const countdown = setInterval(() => {
+                        const minutes = Math.floor(timeLeft / 60);
+                        let seconds = timeLeft % 60;
+
+                        seconds = seconds < 10 ? '0' + seconds : seconds;
+
+                        timerElement.innerHTML = `Time remaining: ${minutes}:${seconds}`;
+
+                        if (timeLeft <= 0) {
+                            clearInterval(countdown);
+                            timerElement.innerHTML = "Code Expired";
+                            timerElement.style.color = "red";
+                        }
+
+                        timeLeft--;
+                    }, 1000);
+                </script>
+                <!-- Resend link could go here -->
+    </div>
+</body>
+
+</html>

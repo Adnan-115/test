@@ -6,4 +6,5 @@ const { protect } = require('../middleware/auth');
 router.get('/', protect, getConversations);
 router.get('/start/:userId', protect, startChat);
 router.post('/delete/:userId', protect, require('../controllers/chatController').deleteConversation);
-// WIP: Fixing bugs... 
+
+module.exports = router;

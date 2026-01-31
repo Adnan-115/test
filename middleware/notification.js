@@ -14,4 +14,8 @@ module.exports = async (req, res, next) => {
             console.error(err);
             res.locals.unreadCount = 0;
         }
-// WIP: Fixing bugs... 
+    } else {
+        res.locals.unreadCount = 0;
+    }
+    next();
+};
