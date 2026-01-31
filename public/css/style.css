@@ -1,0 +1,343 @@
+:root 
+{
+    --primary: #2962ff;
+    /* Terminal Blue */
+    --primary-hover: #1e4bd1;
+    --secondary: #0b0e11;
+    /* Dark BG */
+    --text-dark: #ffffff;
+    /* Invert for dark mode */
+    --text-light: #b2b5be;
+    --bg-gradient: #0b0e11;
+    /* Force Dark */
+    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    --input-bg: #1e222d;
+    --input-border: #2a2e39;
+}
+
+body 
+{
+    font-family: 'Inter', sans-serif;
+    background: #0b0e11 !important;
+    /* Force Dark Background */
+    min-height: 100vh;
+    margin: 0;
+    color: #ffffff !important;
+    /* Force White Text */
+}
+
+/* Navbar */
+.navbar 
+{
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    padding: 1rem 0;
+}
+
+.nav-container 
+{
+    max-width: 95%;
+    /* Increased from 1200px to fill screen better */
+    margin: 0 auto;
+    padding: 0 40px;
+    /* Increased padding slightly */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-avatar 
+{
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e0e0e0;
+}
+
+.nav-profile 
+{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    transition: background 0.2s;
+}
+
+.nav-profile:hover 
+{
+    background: #f1f3f5;
+}
+
+/* Dashboard Sidebar */
+.dashboard-grid 
+{
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+    align-items: start;
+}
+
+.sidebar 
+{
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 90px;
+}
+
+.sidebar-menu 
+{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-menu li 
+{
+    margin-bottom: 0.8rem;
+}
+
+.sidebar-btn 
+{
+    display: block;
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text-dark);
+    background: #f8f9fa;
+    transition: all 0.2s;
+    text-align: left;
+    font-weight: 500;
+}
+
+.sidebar-btn:hover,
+.sidebar-btn.active 
+{
+    background: var(--primary);
+    color: white;
+    transform: translateX(5px);
+}
+
+/* CSS Fix */
+.brand 
+{
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-decoration: none;
+    letter-spacing: -0.5px;
+}
+
+
+.nav-links 
+{
+    list-style: none;
+    display: flex;
+    gap: 25px;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links a 
+{
+    text-decoration: none;
+    color: var(--text-dark);
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+}
+
+.nav-links a:hover 
+{
+    color: var(--primary);
+}
+
+.btn-nav-action 
+{
+    background: var(--primary);
+    color: white !important;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 600 !important;
+    box-shadow: 0 4px 6px rgba(204, 41, 54, 0.2);
+    transition: transform 0.2s, background 0.2s;
+}
+
+
+.btn-nav-action:hover 
+{
+    transform: translateY(-2px);
+    background: var(--primary-hover);
+}
+
+.nav-btn 
+{
+    text-decoration: none;
+    color: var(--text-dark);
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-btn:hover 
+{
+    background: #f1f3f5;
+    color: var(--primary);
+}
+
+.logout-btn:hover 
+{
+    background: #fee2e2;
+    color: #dc3545;
+}
+
+
+/* Auth Pages */
+/* Removed duplicate auth-container definition, handled in shared block below */
+
+.auth-header 
+{
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-header h2 
+{
+    font-size: 1.8rem;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+}
+
+.auth-header p 
+{
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+/* Avatar Upload Professional Redesign */
+.avatar-upload-container 
+{
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 0.5rem;
+    /* Reduced margin for text below */
+}
+
+.avatar-upload 
+{
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    cursor: pointer;
+    position: relative;
+    border: 3px solid #e0e0e0;
+    overflow: hidden;
+    background: #f8f9fa;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.avatar-upload:hover 
+{
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.avatar-preview 
+{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+    /* Hidden by default */
+}
+
+
+.avatar-placeholder 
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    color: #cbd5e0;
+    font-size: 2.5rem;
+}
+
+.avatar-overlay 
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.avatar-upload:hover .avatar-overlay 
+{
+    opacity: 1;
+}
+
+.avatar-hint 
+{
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+.avatar-remove 
+{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 32px;
+    height: 32px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    color: #dc3545;
+    /* Red for delete */
+    display: flex;
+    /* Flex to center icon */
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s;
+    z-index: 10;
+    display: none;
+    /* Hidden by default via JS */
+}
+
+.avatar-remove:hover 
+// TODO: v5jpun 
